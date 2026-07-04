@@ -5,7 +5,7 @@ AI agent skill for [invgate-cli](https://github.com/wdelcant/invgate-cli) — th
 ## Install
 
 ```bash
-skills.sh install wdelcant/invgate-cli-skill
+npx skills add https://github.com/wdelcant/invgate-cli-skill --skill invgate-cli
 ```
 
 ## What it does
