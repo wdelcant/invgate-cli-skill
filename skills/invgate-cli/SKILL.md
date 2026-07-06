@@ -4,7 +4,7 @@ description: "Trigger: invgate, invgate-cli, assets, people, vendors, InvGate AP
 license: MIT
 metadata:
   author: wdelcant
-  version: "1.0"
+  version: "1.1"
 ---
 
 ## Activation Contract
@@ -16,19 +16,23 @@ Load this skill when the user asks to query InvGate (assets, people, vendors, in
 - `invgate-cli` must be installed first. Installation is a pre-requisite, not optional.
 - If `invgate-cli` is not found, guide the user through installation before proceeding.
 - The `setup` command handles spec download and credential storage automatically.
-- Secrets live in the OS keychain, never in config files or environment variables.
+- Secrets live in the OS keychain (macOS/Windows) or a restricted file (Linux fallback).
 - Token refresh is automatic — never ask the user to handle tokens manually.
 
 ## Installation
 
 ```bash
+# Any OS (recommended)
+npm install -g invgate-cli@latest
+
 # macOS / Linux
 brew install wdelcant/tap/invgate-cli
 
-# One-liner (any Unix)
-curl -fsSL https://raw.githubusercontent.com/wdelcant/invgate-cli/main/install.sh | bash
+# Windows
+scoop bucket add invgate https://github.com/wdelcant/scoop-bucket
+scoop install invgate-cli
 
-# Go
+# Go developers
 go install github.com/wdelcant/invgate-cli/cmd/invgate-cli@latest
 ```
 
@@ -38,7 +42,7 @@ go install github.com/wdelcant/invgate-cli/cmd/invgate-cli@latest
 invgate-cli setup
 ```
 
-Prompts for: InvGate instance URL, Client ID, Client Secret. The spec downloads automatically. Output format defaults to `json`.
+Prompts for: InvGate instance URL, Client ID, Client Secret (hidden input). The spec downloads automatically.
 
 ## Common Query Patterns
 
@@ -46,31 +50,31 @@ Prompts for: InvGate instance URL, Client ID, Client Secret. The spec downloads 
 |---|---|
 | List asset types | `invgate-cli asset-types list` |
 | Find assets by owner email | `invgate-cli assets list --owner-email "user@corp.com" --output table` |
-| Find assets by keyword | `invgate-cli assets list --keyword "MacBook" --output table` |
+| Find assets by keyword/serial | `invgate-cli assets list --keyword "MacBook" --output table` |
 | Read a specific asset | `invgate-cli assets read <id>` |
 | List people | `invgate-cli people list --output table` |
 | List vendors | `invgate-cli vendors list --output table` |
 | List computers | `invgate-cli computers list --output table` |
-| List servers | `invgate-cli servers list --output table` |
+| Paginate results | `invgate-cli assets list --page 2 --output table` |
 | Discover all commands | `invgate-cli --help` |
-| Subcommand help | `invgate-cli <resource> --help` |
 
 ## Output Formats
 
 - `json` (default, colored in terminal)
 - `yaml`
-- `table` (human-readable, use `--columns id,name,status` to filter)
-- `csv` (export to file with `> file.csv`)
+- `table` (human-readable, clean column alignment)
+- `csv` (export with `> file.csv`)
+- `record` (vertical key:value per record — best for wide data)
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| `command not found` | Install via Homebrew or one-liner above |
+| `command not found` | Install via npm or brew above |
 | `could not obtain access token` | Re-run `invgate-cli setup` to refresh credentials |
 | `unknown command` | Run `invgate-cli --help` to see available resources |
 | Connection test fails | Verify instance URL and credentials are correct |
-| Warning about spec validation | Harmless — the spec has non-standard fields that are stripped automatically |
+| Credentials lost after 24h | Re-run `invgate-cli setup` (file fallback on headless Linux) |
 
 ## Output Contract
 
